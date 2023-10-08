@@ -136,7 +136,7 @@ func convertAPIRequest(apiRequest APIRequest) (chatgpt.CreateConversationRequest
 	}
 
 	if strings.HasPrefix(apiRequest.Model, "gpt-4") {
-		arkoseToken, err := api.GetArkoseToken()
+		arkoseToken, err := api.GetOpenAIToken()
 		if err == nil {
 			chatgptRequest.ArkoseToken = arkoseToken
 		} else {

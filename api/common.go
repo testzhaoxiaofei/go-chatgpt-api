@@ -170,10 +170,28 @@ func GetAccessToken(c *gin.Context) string {
 func GetArkoseToken() (string, error) {
 	return funcaptcha.GetOpenAIToken(PUID, ProxyUrl)
 }
+func GetOpenAIToken() (string, error) {
+	var arkoseToken string
+	arkoseTokenUrl := os.Getenv("ARKOSE_TOKEN_URL")
+	req, _ := http.NewRequest(http.MethodGet, arkoseTokenUrl, nil)
+	resp, err := Client.Do(req)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return "", err
+	}
+	responseMap := make(map[string]interface{})
+	err = json.NewDecoder(resp.Body).Decode(&responseMap)
+	if err != nil {
+		return "", err
+	}
+	arkoseToken = responseMap["token"].(string)
+
+	return arkoseToken, nil
+}
 
 func setupPUID() {
 	username := os.Getenv("OPENAI_EMAIL")
 	password := os.Getenv("OPENAI_PASSWORD")
+	fmt.Println(username, password)
 	if username != "" && password != "" {
 		go func() {
 			for {
@@ -184,6 +202,7 @@ func setupPUID() {
 				}
 
 				accessToken := authenticator.GetAccessToken()
+				fmt.Println(accessToken)
 				if accessToken == "" {
 					logger.Error(refreshPuidErrorMessage)
 					return
