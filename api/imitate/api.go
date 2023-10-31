@@ -55,6 +55,8 @@ func CreateChatCompletions(c *gin.Context) {
 	translatedRequest, model := convertAPIRequest(originalRequest)
 
 	response, done := sendConversationRequest(c, translatedRequest, token)
+
+	fmt.Println(response.Body)
 	if done {
 		return
 	}
@@ -143,7 +145,8 @@ func convertAPIRequest(apiRequest APIRequest) (chatgpt.CreateConversationRequest
 			fmt.Println("Error getting Arkose token: ", err)
 		}
 		chatgptRequest.Model = apiRequest.Model
-		model = "gpt-4-0613"
+		//model = "gpt-4-0613"
+		model = "gpt-4-dalle"
 	}
 
 	if apiRequest.PluginIDs != nil {
@@ -177,6 +180,9 @@ func sendConversationRequest(c *gin.Context, request chatgpt.CreateConversationR
 	req.Header.Set("User-Agent", api.UserAgent)
 	req.Header.Set(api.AuthorizationHeader, accessToken)
 	req.Header.Set("Accept", "text/event-stream")
+	api.PUID = "user-oxeS7uPH1yNVtQYo62sQR05t:1698743787-5QixJeM0ist1trqhmmq9MlY5FNf7S%2BE1OVI4SVdFBkA%3D"
+
+	fmt.Println("PUID", api.PUID)
 	if api.PUID != "" {
 		req.Header.Set("Cookie", "_puid="+api.PUID)
 	}
